@@ -3,51 +3,103 @@
 // disediakan. Jangan mengubah nama/tipe yang sudah ada kecuali TODO
 // memintanya secara eksplisit.
 
+using System;
+using System.Collections.Generic;
+
 namespace Pertemuan04;
 
 public class Perpustakaan
 {
-    // TODO(Level 7): koleksi di bawah ini PUBLIK -- pihak luar bisa Add/Clear
-    //   seenaknya, melewati aturan Tambah(). Simpan daftar di field PRIVATE
-    //   (List<Buku>) dan ekspos DaftarBuku sebagai properti read-only bertipe
-    //   IReadOnlyList<Buku> (atau IReadOnlyCollection/IEnumerable) yang tidak
-    //   bisa dipakai untuk mengubah koleksi asli.
-    public List<Buku> DaftarBuku = new();
+    // TODO(Level 7): Simpan daftar di field PRIVATE (List<Buku>) dan ekspos 
+    // DaftarBuku sebagai properti read-only bertipe IReadOnlyList<Buku>.
+    private List<Buku> _daftarBuku = new List<Buku>();
+    
+    public IReadOnlyList<Buku> DaftarBuku 
+    { 
+        get { return _daftarBuku.AsReadOnly(); } 
+    }
 
     public int JumlahJudul => DaftarBuku.Count;
 
     public void Tambah(Buku buku)
     {
-        // TODO(Level 7): buku null -> ArgumentNullException; ISBN yang sudah ada
-        //   di koleksi -> InvalidOperationException; selain itu tambahkan ke
-        //   koleksi.
-        throw new NotImplementedException("Level 7 belum diimplementasikan");
+        // TODO(Level 7): buku null -> ArgumentNullException
+        if (buku == null)
+        {
+            throw new ArgumentNullException(nameof(buku), "Buku tidak boleh null.");
+        }
+
+        // ISBN yang sudah ada di koleksi -> InvalidOperationException
+        if (Cari(buku.Isbn) != null)
+        {
+            throw new InvalidOperationException("Buku dengan ISBN ini sudah ada di perpustakaan.");
+        }
+
+        // Selain itu tambahkan ke koleksi
+        _daftarBuku.Add(buku);
     }
 
     public Buku? Cari(string isbn)
     {
-        // TODO(Level 7): kembalikan buku dengan Isbn yang sama persis (apa
-        //   adanya, tanpa normalisasi), atau null kalau tidak ada.
-        throw new NotImplementedException("Level 7 belum diimplementasikan");
+        // TODO(Level 7): kembalikan buku dengan Isbn yang sama persis, atau null
+        foreach (Buku buku in _daftarBuku)
+        {
+            if (buku.Isbn == isbn)
+            {
+                return buku;
+            }
+        }
+        return null;
     }
 
     public void PinjamBuku(string isbn, AkunAnggota akun)
     {
-        // TODO(Level 10): "Tell, don't ask" -- Perpustakaan memutuskan semuanya.
-        //   akun null -> ArgumentNullException; ISBN tidak ada ->
-        //   ArgumentException; akun.Denda > 0 -> InvalidOperationException;
-        //   akun.JumlahPinjamanAktif sudah sama dengan AkunAnggota.MaksPinjaman
-        //   -> InvalidOperationException; selain itu panggil buku.Pinjam()
-        //   (boleh melempar kalau stok habis) lalu akun.CatatPinjam().
-        throw new NotImplementedException("Level 10 belum diimplementasikan");
+        // TODO(Level 10): "Tell, don't ask"
+        if (akun == null)
+        {
+            throw new ArgumentNullException(nameof(akun), "Akun tidak boleh null.");
+        }
+
+        Buku? buku = Cari(isbn);
+        if (buku == null)
+        {
+            throw new ArgumentException("Buku tidak ditemukan.", nameof(isbn));
+        }
+
+        if (akun.Denda > 0)
+        {
+            throw new InvalidOperationException("Anggota masih memiliki tanggungan denda.");
+        }
+
+        if (akun.JumlahPinjamanAktif >= AkunAnggota.MaksPinjaman)
+        {
+            throw new InvalidOperationException("Batas maksimal peminjaman telah tercapai.");
+        }
+
+        buku.Pinjam();
+        akun.CatatPinjam();
     }
 
     public void KembalikanBuku(string isbn, AkunAnggota akun)
     {
-        // TODO(Level 10): akun null -> ArgumentNullException; ISBN tidak ada ->
-        //   ArgumentException; akun.JumlahPinjamanAktif = 0 ->
-        //   InvalidOperationException; selain itu panggil buku.Kembalikan() lalu
-        //   akun.CatatKembali().
-        throw new NotImplementedException("Level 10 belum diimplementasikan");
+        // TODO(Level 10)
+        if (akun == null)
+        {
+            throw new ArgumentNullException(nameof(akun), "Akun tidak boleh null.");
+        }
+
+        Buku? buku = Cari(isbn);
+        if (buku == null)
+        {
+            throw new ArgumentException("Buku tidak ditemukan.", nameof(isbn));
+        }
+
+        if (akun.JumlahPinjamanAktif == 0)
+        {
+            throw new InvalidOperationException("Anggota tidak sedang meminjam buku apapun.");
+        }
+
+        buku.Kembalikan();
+        akun.CatatKembali();
     }
 }
