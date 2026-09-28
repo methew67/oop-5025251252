@@ -13,6 +13,7 @@ public class Buku
     //   bisa mengubahnya sembarangan). Jadikan field PRIVATE (awali nama dengan
     //   _) lalu ekspos lewat properti read-only: public get, tanpa setter
     //   publik. Nama properti tetap Isbn, Judul, StokTotal, StokTersedia.
+    // test
     
     private string _isbn = "";
     public string Isbn { get { return _isbn; } }
