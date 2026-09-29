@@ -41,12 +41,27 @@ public class Anggota
         // TODO(Level 2): id/nama null/kosong/spasi -> ArgumentException; alamat
         //   null -> ArgumentNullException; selain itu isi Id, Nama, Alamat
         //   (simpan objek Alamat yang sama, jangan disalin).
-        throw new NotImplementedException("Level 2 belum diimplementasikan");
+       if (string.IsNullOrWhiteSpace(id))
+        {
+            throw new ArgumentException("Id tidak boleh kosong.", nameof(id));
+        }
+        if (string.IsNullOrWhiteSpace(nama))
+        {
+            throw new ArgumentException("Nama tidak boleh kosong.", nameof(nama));
+        }
+        if (alamat == null)
+        {
+            throw new ArgumentNullException(nameof(alamat), "Alamat tidak boleh null.");
+        }
+        Id = id;
+        Nama = nama;
+        Alamat = alamat;
     }
 
     public string Info()
     {
         // TODO(Level 2): kembalikan "<Id> - <Nama>" (contoh: "M01 - Sari").
+        return $"{Id} - {Nama}";
         throw new NotImplementedException("Level 2 belum diimplementasikan");
     }
 
